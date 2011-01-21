@@ -1,0 +1,195 @@
+%\VignetteIndexEntry{Vega}
+%\VignetteDepends{}
+%\VignetteKeywords{CGH Analysis}
+%\VignettePackage{Vega}
+\documentclass[a4paper,10pt]{article}
+
+\usepackage{graphicx}
+
+\usepackage[dvips,colorlinks=true]{hyperref}
+\hypersetup{
+	bookmarksnumbered=true,
+	linkcolor=black,
+	citecolor=black,
+	pagecolor=black,
+	urlcolor=black,
+}
+
+%opening
+\title{Vega: Variational Segmentation for Copy Number Detection}
+
+\author{Sandro Morganella \and Luigi Cerulo \and Giuseppe Viglietto \and Michele Ceccarelli}
+
+\date{}
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section{Overview}
+This document describes classes and functions of Vega (Variational Estimator of Genomic Aberrations) package. Vega algorithm allows to segment copy number profiles from array comparative genomic hybridization (aCGH) data. This package implements the algorithm described in \lq\lq VEGA: Variational segmentation for copy number detection\rq\rq~\cite{Morganella2010}. 
+
+Here we show as users can use Vega to perform the copy number segmentation task. The Log R Ratio (LRR) data used in the presented examples concern the mantle cell lymphoma (MCL) Granta-519 cell line previously published by DeLeeuw {\it et~al}. \cite{DeLeeuw2004}.
+
+\section{Installation}
+Install VEGA on your computer by using the following command:
+
+\begin{verbatim}
+source("http://bioconductor.org/biocLite.R")
+biocLite("Vega")
+\end{verbatim}
+
+
+\section{Vega .RData Description}
+\label{dataDescription}
+In Vega package you find the LRR data of the mantle cell lymphoma (MCL) Granta-519 cell line previously published by DeLeeuw {\it et~al}.The data are obtained by using SMRT aCGH containing $97\,299$ elements, representing $32\,433$ overlapping genomic segments spanning the entire human genome \cite{Ishkanian2004}.
+
+Load Vega package:
+<<loadVega>>=
+library(Vega)
+@
+
+Load Granta-519 data:
+<<loadG519Data>>=
+data(G519)
+@
+
+G519 data is organized as a matrix having four columns:
+\begin{itemize}
+ \item Chromosome
+ \item Start position for the observed probe
+ \item End position for the observed probe
+ \item The measured LRR for the probe
+\end{itemize}
+
+\begin{small}
+
+<<printG519Data>>=
+G519[1:16,]
+@ 
+\end{small}
+
+\section{Run Vega}
+In order to run Vega algorithm the user needs to use the function {\ttfamily vega}. This function can be used passing only two arguments: the data (a matrix having the structure described in the previous section) and the list of chromosomes that will be analyzed (see Appendix \ref{appendix:MainFunction} for more details). In order to run Vega on Granta-519 data use the following command:
+
+<<runVegaWithSexChromosomes, results=hide>>=
+seg <- vega(CNVdata=G519, chromosomes=c(1:22,"X","Y"))
+@
+
+Note that the previous segmentation is computed considering all chromosomes of Granta-519 ({\ttfamily c(1:22,"X","Y")}).
+
+If you want analyze only a subset of chromosomes you can conveniently set the argument {\ttfamily chromosomes}. For example if you want to run Vega algorithm on the chromosomes 1 and X you will use the following command
+
+<<runVegaChromosomes_1_and_X>>=
+seg_1X <- vega(CNVdata=G519, chromosomes=c(1,"X"))
+@
+
+The computed segmentation can be found in the R object {\ttfamily seg}:
+
+\begin{small}
+<<printResults>>=
+seg[1:5,]
+@
+\end{small}
+
+Analyzing the first line of the output, we can deduce that on the chromosome 1 the region from the bp $0$ to the bp $3\,098\,099$ (which contains $36$ probes) has a LRR mean value of $\approx 0.218$ and it is considered as a chromosomal gain.
+
+In addition you can save the computed segmentation into a tab delimited file by setting the argument {\ttfamily out\_file\_name} with the name of the file (for example segmentation.txt). For more detail about this file see the next subsection (\ref{out_file_format}). Other two parameters can be chosen by the user: {\ttfamily beta} and {\ttfamily min\_region\_size} for more details on these parameters see Appendix \ref{appendix:MainFunction}.
+
+\subsection{Output File Format}
+\label{out_file_format}
+If you want to save the computed segmentation into a tab delimited file you can run VEGA with the additional parameter {\ttfamily out\_file\_name}. This file has a row for each segmented region and for each of them it has seven features (columns of the file):
+
+\begin{description}
+ \item[\textbf{Chromosome}:] the chromosome containing the region
+ \item[\textbf{bp Start}:] the genomic start position (in bp) of the region
+ \item[\textbf{bp End}:] the genomic end position (in bp) of the region
+ \item[\textbf{Num of Markers}:] the number of markers contained in the region
+ \item[\textbf{Mean}:] the mean value of the LRR of all probes contained in the region
+ \item[\textbf{Label}:] indicates the computed label of the region: loss (-1), normal (0) and gain (1).
+\end{description}
+
+
+\section{Segmentation Plot Utility}
+
+In Vega a plot utility called {\ttfamily plotSegmentation} is provided to show an overview combining LRR data and computed segmentation. The user can specify both the chromosomes and the segmentation informations that have to be shown. In particular if the user wants to plot the LRR mean value of each region he needs to set the argument {\ttfamily opt=0} (which is the default value). In contrast if the user wants to plot the computed label of each region (loss, normal and gain) he needs to set {\ttfamily opt=1}. In the following of this section some plot examples are provided.
+
+\subsection{Plot All Chromosomes with the LRR Mean Values}
+The next commands allows to plot an overview of all analyzed chromosomes ({\ttfamily chromosomes=c(1:22,"X","Y")}) in which the LRR mean values are reported ({\ttfamily opt=0}).
+\begin{center}
+<<plotAllChromosomes_LRR, fig=TRUE, results=hide, height=7, width=14>>=
+plotSegmentation(G519, seg, chromosomes=c(1:22,"X","Y"), opt=0)
+@
+\end{center}
+
+\subsection{Plot Chromosome 1 with the Respective LRR Mean Values}
+The next command plots only the chromosome 1 ({\ttfamily chromosomes=c(1)}) with the LRR mean value ({\ttfamily opt=0}).
+\begin{center}
+<<PlotChromosome1_LRR, fig=TRUE>>=
+plotSegmentation(G519, seg, chromosomes=c(1), opt=0)
+@ 
+\end{center}
+
+\subsection{Plot Chromosome 1 with the Respective Labels}
+The next command plots only the chromosome 1 ({\ttfamily chromosomes=c(1)}) with the label computed for each region ({\ttfamily opt=1})
+\begin{center}
+<<PlotChromosome1_Label, fig=TRUE>>=
+plotSegmentation(G519, seg, chromosomes=c(1), opt=1)
+@ 
+\end{center}
+
+From this plot we can notice that on the chromosome 1 we find 8 mutations (2 gains and 6 losses).
+
+\appendix
+\section{Vega: Function Description}
+\label{appendix:MainFunction}
+\subsection{{\ttfamily vega}}
+The function {\ttfamily vega} computes the segmentation on the aCGH data passed as argument. The header of {\ttfamily vega} follows:
+
+\begin{verbatim}
+vega(CNVdata, chromosomes, out_file_name="segmentation.txt",
+     beta=0.5, min_region_size=2)
+\end{verbatim}
+
+\begin{description}
+ \item[{\ttfamily CNVdata}:] This argument is a  matrix containing all informations about the observations: Chromosome, Probe Start Position, Probe End Position and LRR. For more details see Section \ref{dataDescription}.
+
+ \item[{\ttfamily chromosomes}:] This argument is used to list the chromosomes that have to be processed. By using {\ttfamily c(1:22, "X", "Y")} all chromosomes will be segmented.
+
+ \item[{\ttfamily out\_file\_name}:] (default value:\lq\lq\rq\rq) This name is used to save the computed segmentation into a tab delimited file. If the default value is used no file will be saved. For more details see Section \ref{out_file_format}.
+ 
+ \item[{\ttfamily beta}:] (default value $0.5$)  This argument is used to define the stop condition of Vega algorithm (see \cite{Morganella2010} for more details).
+ 
+ \item[{\ttfamily min\_region\_size}:] (default value $2$) This argument specifies the minimum size allowed for the segmented regions.
+ 
+\end{description}
+
+\subsection{{\ttfamily plotSegmentation}}
+The function {\ttfamily plotSegmentation} plots observations and segmentation results. the header of {\ttfamily plotSegmentation} function follows:
+\begin{verbatim}
+plotSegmentation(CNVdata, segmentation, chromosomes, opt = 0)
+
+\end{verbatim}
+
+\begin{description}
+ \item[{\ttfamily CNVdata}:] This argument specifies the matrix containing all informations about the observations: Chromosome, Probe Start Position, Probe End Position and LRR. For more details see Section \ref{dataDescription}.
+
+\item[{\ttfamily segmentation}:] This argument is the segmentation computed by {\ttfamily vega} function on the observations contained in {\ttfamily CNVdata}.
+ 
+ \item[{\ttfamily chromosomes}:] This argument is used to list the chromosomes that have to be plotted. By using {\ttfamily c(1:22, "X", "Y")} all chromosomes will be plotted.
+
+ \item[{\ttfamily opt}:] (default value $0$)  This argument is used to choose the segmentation informations that have to be plotted. If {\ttfamily opt=0} then the LRR mean value of each segmented region is shown. If {\ttfamily opt=1} the label of each region is shown where levels -1, 0 and 1 are associated with loss, normal and gain respectively.
+ 
+\end{description}
+
+\begin{thebibliography}{}
+
+\bibitem{DeLeeuw2004} DeLeeuw RJ. {\it et~al} (2004). Comprehensive whole genome array CGH profiling of mantle cell lymphoma model genomes, \textit{Human Molecular Genetics} \textbf{13}(17):1827-1837.
+
+\bibitem{Ishkanian2004} Ishkanian AS. {\it et~al}. (2004). A tiling resolution DNA microarray with complete coverage of the human genome, \textit{Nature Genetics} \textbf{36}:299-303.
+
+\bibitem{Morganella2010} Morganella S. {\it et~al}. (2010).VEGA: Variational segmentation for copy number detection, \textit{Bioinformatics}.
+
+\end{thebibliography}
+\end{document}
