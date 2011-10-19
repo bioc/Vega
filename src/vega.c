@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "Rdefines.h"
 
 #define EPSILON 0.00001
 #define ROUND_CNST 1000
@@ -61,7 +62,6 @@ typedef double priority;
 typedef struct node {
   priority p;
   unsigned int id;
-  int curr_index;
   short sentinel;
 } node ;
 
@@ -310,7 +310,7 @@ int node_find(binary_heap a,unsigned int id) {
 }
 
 /* function to print an error message */
-void print_error(char *msg) { printf("# ERROR: %s\n",msg); 
+void print_error(char *msg) { Rprintf("# ERROR: %s\n",msg); 
 }
 /* ------------ end priority queue pqops ------------------*/
 /*---------------------------------------------------------*/
