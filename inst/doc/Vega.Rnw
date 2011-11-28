@@ -6,7 +6,7 @@
 
 \usepackage{graphicx}
 
-\usepackage[dvips,colorlinks=true]{hyperref}
+\usepackage[colorlinks=true]{hyperref}
 \hypersetup{
 	bookmarksnumbered=true,
 	linkcolor=black,
