@@ -1,7 +1,7 @@
 Package: Vega
 Type: Package
 Title: An R package for copy number data segmentation
-Version: 1.10.0
+Version: 1.11.0
 Date: 2010-06-22
 Author: Sandro Morganella
 Maintainer: Sandro Morganella <sandro@ebi.ac.uk>
