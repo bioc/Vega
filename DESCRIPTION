@@ -1,13 +1,15 @@
 Package: Vega
 Type: Package
 Title: An R package for copy number data segmentation
-Version: 1.11.1
+Version: 1.11.2
 Date: 2010-06-22
 Author: Sandro Morganella
 Maintainer: Sandro Morganella <sandro@ebi.ac.uk>
-Description: Vega (Variational Estimator for Genomic Aberrations) is an algorithm that adapts a very popular variational model (Mumford and Shah) used in image segmentation so that chromosomal aberrant regions can be efficiently detected.
+Description: Vega (Variational Estimator for Genomic Aberrations) is an
+        algorithm that adapts a very popular variational model (Mumford
+        and Shah) used in image segmentation so that chromosomal
+        aberrant regions can be efficiently detected.
 Depends: R (>= 2.10)
 License: GPL-2
 LazyLoad: yes
-biocViews: aCGH, CopyNumberVariants
-
+biocViews: aCGH, CopyNumberVariation
