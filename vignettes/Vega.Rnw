@@ -36,8 +36,9 @@ Here we show as users can use Vega to perform the copy number segmentation task.
 Install VEGA on your computer by using the following command:
 
 \begin{verbatim}
-source("http://bioconductor.org/biocLite.R")
-biocLite("Vega")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("Vega")
 \end{verbatim}
 
 
