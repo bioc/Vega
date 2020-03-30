@@ -1,7 +1,7 @@
 Package: Vega
 Type: Package
 Title: An R package for copy number data segmentation
-Version: 1.35.0
+Version: 1.35.1
 Date: 2010-06-22
 Author: Sandro Morganella
 Maintainer: Sandro Morganella <sandro@ebi.ac.uk>
@@ -13,3 +13,4 @@ Depends: R (>= 2.10)
 License: GPL-2
 LazyLoad: yes
 biocViews: aCGH, CopyNumberVariation
+PackageStatus: Deprecated
